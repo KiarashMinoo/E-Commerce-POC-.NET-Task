@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Prometheus;
 using Serilog;
 using System.IO.Compression;
+using Infrastructure.DependencyInjection;
 
 try
 {
@@ -30,6 +31,8 @@ try
 
     // Add services to the container.
     builder.Services.
+        AddServices()
+        AddDbServices().
         AddLogging(options => options.AddSerilog(dispose: true)).
         Configure<BrotliCompressionProviderOptions>(options => { options.Level = CompressionLevel.Optimal; }).
         Configure<GzipCompressionProviderOptions>(options => { options.Level = CompressionLevel.Optimal; }).
