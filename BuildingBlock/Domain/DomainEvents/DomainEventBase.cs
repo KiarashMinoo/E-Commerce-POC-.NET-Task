@@ -2,11 +2,8 @@
 {
     public abstract class DomainEventBase : IDomainEvent
     {
-        public DateTime OccurredOn { get; }        
+        public DateTime OccurredOn { get; }
 
-        public DomainEventBase() 
-        {
-            OccurredOn = DateTime.Now;
-        }
+        public DomainEventBase() => OccurredOn = DateTime.Now;
     }
 }

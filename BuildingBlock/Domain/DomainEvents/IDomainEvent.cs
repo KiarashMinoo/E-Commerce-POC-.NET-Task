@@ -1,6 +1,8 @@
-﻿namespace BuildingBlocks.Domain.DomainEvents
+﻿using MediatR;
+
+namespace BuildingBlocks.Domain.DomainEvents
 {
-    public interface IDomainEvent
+    public interface IDomainEvent : INotification
     {
         DateTime OccurredOn { get; }
     }

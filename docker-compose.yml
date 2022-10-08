@@ -1,0 +1,163 @@
+version: '3.4'
+
+networks:
+  postgresql:
+  mongodb:
+  api: 
+
+volumes:
+  postgres-master-data:
+    driver: local
+  postgres-slave-data:
+    driver: local
+  mongodb-master-data:
+    driver: local
+  mongodb-slave-data:
+    driver: local
+
+services:
+  postgres-master:
+    image: bitnami/postgresql:latest
+    restart: on-failure
+    networks:
+      - postgresql
+    volumes:
+       - postgres-master-data:/bitnami/postgresql       
+    environment:
+      - POSTGRESQL_REPLICATION_MODE=master
+      - POSTGRESQL_REPLICATION_USER=repl_user_postgres
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password_P@ssW0rd
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=P@ssW0rd      
+      - POSTGRESQL_DATABASE=ECommerce
+      - ALLOW_EMPTY_PASSWORD=yes     
+      - TZ=Asia/Tehran
+      - PGTZ=Asia/Tehran    
+
+  postgres-slave:
+    image: bitnami/postgresql:latest
+    restart: on-failure      
+    networks:
+      - postgresql
+    volumes:
+       - postgres-slave-data:/bitnami/postgresql   
+    depends_on:
+      - postgres-master
+    environment:      
+      - POSTGRESQL_REPLICATION_MODE=slave
+      - POSTGRESQL_REPLICATION_USER=repl_user_postgres
+      - POSTGRESQL_REPLICATION_PASSWORD=repl_password_P@ssW0rd
+      - POSTGRESQL_MASTER_HOST=postgres-master
+      - POSTGRESQL_PASSWORD=P@ssW0rd      
+      - POSTGRESQL_MASTER_PORT_NUMBER=5432
+      - ALLOW_EMPTY_PASSWORD=yes
+      - TZ=Asia/Tehran
+      - PGTZ=Asia/Tehran     
+    deploy: 2     
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    restart: on-failure    
+    networks:
+      - postgresql
+    depends_on:
+      - postgres-master
+      - postgres-slave
+    environment:      
+      - DB_USER=postgres
+      - DB_PASSWORD=P@ssW0rd
+      - DB_HOST=postgres-master
+      - DB_NAME=ECommerce
+      - POOL_MODE=transaction
+      - ADMIN_USERS=postgres
+      - AUTH_TYPE=plain
+
+  mongodb-master:
+    image: bitnami/mongodb:latest
+    restart: on-failure
+    networks:
+      - mongodb    
+    volumes:
+      - mongodb-master-data:/bitnami/data
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-master
+      - MONGODB_REPLICA_SET_MODE=primary
+      - MONGODB_ROOT_PASSWORD=repl_password_P@ssW0rd
+      - MONGODB_REPLICA_SET_KEY=repl_key
+      - TZ=Asia/Tehran
+      - PGTZ=Asia/Tehran      
+
+  mongodb-slave:
+    image: bitnami/mongodb:latest    
+    restart: on-failure
+    networks:
+      - mongodb
+    depends_on:
+      - mongodb-master
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-slave
+      - MONGODB_REPLICA_SET_MODE=secondary
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-master
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=repl_password_P@ssW0rd
+      - MONGODB_REPLICA_SET_KEY=repl_key      
+      - TZ=Asia/Tehran
+      - PGTZ=Asia/Tehran   
+    deploy:
+      replicas: 2
+
+  mongodb-arbiter:
+    image: bitnami/mongodb:latest    
+    restart: on-failure
+    networks:
+      - mongodb
+    depends_on:
+      - mongodb-master
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
+      - MONGODB_REPLICA_SET_MODE=arbiter
+      - MONGODB_INITIAL_PRIMARY_HOST=mongodb-master
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=repl_password_P@ssW0rd
+      - MONGODB_REPLICA_SET_KEY=repl_key      
+      - TZ=Asia/Tehran
+      - PGTZ=Asia/Tehran  
+
+  ecommerce:
+    image: ${DOCKER_REGISTRY-}ecommerce
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    hostname: ecommerce
+    networks:
+      - postgresql
+      - mongodb
+      - api
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - pgbouncer
+      - mongodb-master
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - TZ=Asia/Tehran
+      - PGTZ=Asia/Tehran  
+    deploy: 3
+
+  portfolio-nginx:
+    image: bitnami/openresty:latest
+    restart: on-failure    
+    ports: 
+      - "8080:80"  
+    networks:      
+      - api
+    volumes:       
+      - ./nginx.conf:/etc/openresty/nginx.conf:ro
+    links:
+      - api
+    depends_on:
+      - api
+    environment:      
+      - TZ=Asia/Tehran
+      - PGTZ=Asia/Tehran    

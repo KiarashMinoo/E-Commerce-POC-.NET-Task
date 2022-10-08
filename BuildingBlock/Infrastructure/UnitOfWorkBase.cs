@@ -27,13 +27,4 @@ namespace BuildingBlocks.Infrastructure
         {
         }
     }
-
-    public class UnitOfWorkBase<TContext> : UnitOfWorkBase where TContext : IContext
-    {
-        protected TContext Context { get; }
-
-        public UnitOfWorkBase(TContext context) => Context = context;
-
-        public override Task<int> CommitAsync(CancellationToken cancellationToken = default) => Task.FromResult(1);
-    }
 }

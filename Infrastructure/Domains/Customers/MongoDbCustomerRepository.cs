@@ -36,5 +36,12 @@ namespace Infrastructure.Domains.Customers
             var filter = Builders<Customer>.Filter.Eq(a => a.Id, id);
             return await context.Customers.Find(filter).FirstOrDefaultAsync(cancellationToken);
         }
+
+        public async Task<Customer> UpdateAsync(Customer customer, CancellationToken cancellationToken = default)
+        {
+            var filter = Builders<Customer>.Filter.Eq(a => a.Id, customer.Id);
+            await context.Customers.ReplaceOneAsync(filter, customer, new ReplaceOptions() { }, cancellationToken);
+            return customer;
+        }
     }
 }
