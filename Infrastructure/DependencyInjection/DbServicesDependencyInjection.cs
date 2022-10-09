@@ -11,7 +11,7 @@ namespace Infrastructure.DependencyInjection
 {
     public static class DbServicesDependencyInjection
     {
-        public static IServiceCollection AddDbServices(IServiceCollection services, IConfiguration configuration, string postgreSqlConnectionStringName, string mongoDbSectionName)
+        public static IServiceCollection AddDbServices(this IServiceCollection services, IConfiguration configuration, string postgreSqlConnectionStringName, string mongoDbSectionName)
         {
             //PostgreSql Config
             services.AddDbContext<IPostgreSqlContext, PostgreSqlContext>((provider, options) =>

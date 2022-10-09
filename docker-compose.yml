@@ -3,6 +3,7 @@ version: '3.4'
 networks:
   postgresql:
   mongodb:
+  elastic:
   api: 
 
 volumes:
@@ -13,6 +14,10 @@ volumes:
   mongodb-master-data:
     driver: local
   mongodb-slave-data:
+    driver: local
+  elasticsearch-master-data:
+    driver: local
+  elasticsearch-slave-data:
     driver: local
 
 services:
@@ -122,6 +127,56 @@ services:
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran  
 
+  elasticsearch-master:
+    image: docker.elastic.co/elasticsearch/elasticsearch:latest
+    restart: on-failure   
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.zen.minimum_master_nodes=2
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1      
+    volumes:
+      - elasticsearch-master-data:/usr/share/elasticsearch/data    
+    networks:
+      - elastic    
+
+  elasticsearch-slave:
+    image: docker.elastic.co/elasticsearch/elasticsearch:latest    
+    restart: on-failure   
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "discovery.zen.ping.unicast.hosts=elasticsearch"
+      - discovery.zen.minimum_master_nodes=2
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch-slave-data:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    deploy: 
+      replicas: 2
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:latest
+    restart: on-failure 
+    ports:
+      - 5601:5601
+    environment:
+      SERVER_NAME: 0.0.0.0
+      SERVER_PORT: 5601
+      ELASTICSEARCH_URL: http://elasticsearch-master:9200
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch-master:9200"]'
+    networks:
+      - elastic
+
   ecommerce:
     image: ${DOCKER_REGISTRY-}ecommerce
     build:
@@ -133,6 +188,7 @@ services:
       - postgresql
       - mongodb
       - api
+      - elastic
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro

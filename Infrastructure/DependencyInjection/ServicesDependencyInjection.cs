@@ -10,7 +10,7 @@ namespace Infrastructure.DependencyInjection
 {
     public static class ServicesDependencyInjection
     {
-        public static IServiceCollection AddServices(IServiceCollection services)
+        public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddMediatR(typeof(CreateCustomerCommand).Assembly);
             services.AddCommandHandlerFluentValidation(new[] { typeof(CreateCustomerCommandValidator).Assembly });

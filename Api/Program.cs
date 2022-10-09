@@ -32,7 +32,7 @@ try
     // Add services to the container.
     builder.Services.
         AddServices().
-        AddDbServices().
+        AddDbServices(builder.Configuration, "PostgreSql", "MongoDb").
         AddLogging(options => options.AddSerilog(dispose: true)).
         Configure<BrotliCompressionProviderOptions>(options => { options.Level = CompressionLevel.Optimal; }).
         Configure<GzipCompressionProviderOptions>(options => { options.Level = CompressionLevel.Optimal; }).
