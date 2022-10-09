@@ -1,7 +1,9 @@
 ﻿using Application.CQRS.Customers.Commands.Create;
 using Application.CQRS.Customers.Queries.ListAll;
+using Application.Services.Token;
 using BuildingBlocks.Application.Data;
 using BuildingBlocks.Infrastructure.DependencyInjection;
+using Infrastructure.Services;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -21,6 +23,8 @@ namespace Infrastructure.DependencyInjection
             services.AddAutoMapper(automapperAssemblies.ToArray());
 
             services.TryAddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.TryAddTransient<ITokenService, TokenService>();
 
             return services;
         }

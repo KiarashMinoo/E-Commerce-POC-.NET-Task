@@ -30,5 +30,8 @@ namespace Infrastructure.Domains.Customers
 
         public Task<Customer?> RetrieveAsync(Guid id, CancellationToken cancellationToken = default)
             => context.Customers.FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
+
+        public Task<Customer?> RetrieveByEMailAsync(string eMail, CancellationToken cancellationToken = default)
+            => context.Customers.FirstOrDefaultAsync(a => a.EMail == eMail, cancellationToken);
     }
 }

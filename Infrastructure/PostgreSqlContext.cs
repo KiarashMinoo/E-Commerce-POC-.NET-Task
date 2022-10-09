@@ -3,6 +3,7 @@ using Application.Data;
 using DnsClient.Internal;
 using Domain.Customers;
 using Domain.Products;
+using Domain.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -19,6 +20,8 @@ namespace Infrastructure
         public DbSet<Customer> Customers { get; set; } = null!;
 
         public DbSet<Product> Products { get; set; } = null!;
+
+        public DbSet<User> Users { get; set; } = null!;
 
         public PostgreSqlContext(ILogger<PostgreSqlContext> logger, DbContextOptions<PostgreSqlContext> options, IMediator mediator) : base(options)
         {

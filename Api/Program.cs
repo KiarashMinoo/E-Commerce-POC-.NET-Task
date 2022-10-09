@@ -1,14 +1,17 @@
+using Application.Services.Token;
 using Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Prometheus;
 using Serilog;
 using System.IO.Compression;
+using System.Text;
 
 try
 {
@@ -35,6 +38,9 @@ try
         Enrich.FromLogContext().
         CreateLogger();
 
+    var jwtConfiguration = new JwtConfiguration();
+    builder.Configuration.GetSection("Jwt").Bind(jwtConfiguration);
+
     // Add services to the container.
     builder.Services.
         AddServices().
@@ -57,6 +63,22 @@ try
                     .SetIsOriginAllowed((host) => true));
         }).
         AddHttpContextAccessor().
+        AddSingleton(jwtConfiguration).
+        AddAuthentication().
+        AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtConfiguration.Issuer,
+                ValidAudience = jwtConfiguration.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.Key))
+            };
+        }).
+        Services.
         AddControllers().
         AddNewtonsoftJson(options =>
         {

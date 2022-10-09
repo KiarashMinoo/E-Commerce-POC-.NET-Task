@@ -1,5 +1,6 @@
 ﻿using Domain.Customers;
 using Domain.Products;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Data
@@ -8,6 +9,7 @@ namespace Application.Data
     {
         DbSet<Customer> Customers { get; }
         DbSet<Product> Products { get; }
+        DbSet<User> Users { get; }
 
         Task MigrateAsync(CancellationToken cancellationToken = default);
 

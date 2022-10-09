@@ -8,6 +8,7 @@ namespace Domain.Customers
     {
         Task<Customer> AddAsync(Customer customer, CancellationToken cancellationToken = default);
         Task<Customer?> RetrieveAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<Customer?> RetrieveByEMailAsync(string eMail, CancellationToken cancellationToken = default);
         Task DeleteAsync(Customer customer, CancellationToken cancellationToken = default);
     }
 }
