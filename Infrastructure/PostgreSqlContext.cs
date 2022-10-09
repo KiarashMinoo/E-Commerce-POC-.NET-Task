@@ -57,8 +57,11 @@ namespace Infrastructure
 
         private async Task SeedAsync(CancellationToken cancellationToken = default)
         {
-            await mediator.Send(new CreateCustomerCommand("Ibrahim Elmeligy", "ielmeligy@creativeadvtech.com", "+971565065300"), cancellationToken);
-            await mediator.Send(new CreateCustomerCommand("Ahmad(Kia) Minoo", "ahmadminoo@gmail.com", "+989123394363"), cancellationToken);
+            if (!Customers.Any(a => a.EMail == "ielmeligy@creativeadvtech.com"))
+                await mediator.Send(new CreateCustomerCommand("Ibrahim Elmeligy", "ielmeligy@creativeadvtech.com", "+971565065300"), cancellationToken);
+
+            if (!Customers.Any(a => a.EMail == "ahmadminoo@gmail.com"))
+                await mediator.Send(new CreateCustomerCommand("Ahmad(Kia) Minoo", "ahmadminoo@gmail.com", "+989123394363"), cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
