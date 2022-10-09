@@ -1,31 +1,34 @@
 ﻿using BuildingBlocks.Domain;
+using Domain.Customers.BusinessRules.CustomerCellMustBeUnique;
+using Domain.Customers.BusinessRules.CustomerEMailMustBeUnique;
 using Domain.Customers.DomainEvents;
 
 namespace Domain.Customers
 {
     public class Customer : EntityBase, IAggregateRoot
     {
-        public Guid Id { get; }
+        public Guid Id { get; private set; }
         public string FullName { get; private set; } = null!;
         public string EMail { get; private set; } = null!;
         public string Cell { get; private set; } = null!;
 
         private Customer() => Id = Guid.NewGuid();
 
-        public Customer(Guid id, string fullName, string eMail, string cell) : this()
+        public Customer(string fullName, string eMail, string cell, ICustomerCellMustBeUniqueHandler cellHandler, ICustomerEMailMustBeUniqueHandler eMailHandler) : this()
         {
-            Id = id;
+            CheckBusinessRule(new CustomerCellMustBeUniqueBusinessRule(cellHandler, Id, cell));
+            CheckBusinessRule(new CustomerEMailMustBeUniqueBusinessRule(eMailHandler, Id, eMail));
+
             FullName = fullName;
             EMail = eMail;
             Cell = cell;
         }
 
-        public Customer(string fullName, string eMail, string cell) : this(Guid.NewGuid(), fullName, eMail, cell)
+        public Customer Update(string fullName, string eMail, string cell, ICustomerCellMustBeUniqueHandler cellHandler, ICustomerEMailMustBeUniqueHandler eMailHandler)
         {
-        }
+            CheckBusinessRule(new CustomerCellMustBeUniqueBusinessRule(cellHandler, Id, cell));
+            CheckBusinessRule(new CustomerEMailMustBeUniqueBusinessRule(eMailHandler, Id, eMail));
 
-        public Customer Update(string fullName, string eMail, string cell)
-        {
             FullName = fullName;
             EMail = eMail;
             Cell = cell;

@@ -1,3 +1,4 @@
+using Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -7,7 +8,6 @@ using Newtonsoft.Json;
 using Prometheus;
 using Serilog;
 using System.IO.Compression;
-using Infrastructure.DependencyInjection;
 
 try
 {
@@ -62,33 +62,22 @@ try
             options.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.None;
             options.SerializerSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
         }).Services.
-        AddHealthChecks().
-        AddNpgSql(builder.Configuration.GetConnectionString("PostgreSql")).
-        AddMongoDb(builder.Configuration["MongoDb:ConnectionString"]).
-        AddDiskStorageHealthCheck(null).
-        AddPrivateMemoryHealthCheck(367001600).
-        AddProcessAllocatedMemoryHealthCheck(1).
-        ForwardToPrometheus();
+        AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new OpenApiInfo { Title = "E-Commerce API", Version = "v1" });
 
-    if (builder.Environment.IsDevelopment())
-    {
-        builder.Services.
-            AddSwaggerGen(options =>
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                options.SwaggerDoc("v1", new OpenApiInfo { Title = "E-Commerce API", Version = "v1" });
-
-                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = @"JWT Authorization header using the Bearer scheme. 
+                Description = @"JWT Authorization header using the Bearer scheme. 
                       Enter 'Bearer' [space] and then your token in the text input below.
                       Example: 'Bearer 12345abcdef'",
-                    Name = HeaderNames.Authorization,
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
-                });
+                Name = HeaderNames.Authorization,
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
 
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
                 {
                     new OpenApiSecurityScheme
@@ -106,19 +95,23 @@ try
                 }
                 });
 
-                Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly).
-                    ToList().
-                    ForEach(xml => options.IncludeXmlComments(xml, includeControllerXmlComments: true));
-            }).
-            AddSwaggerGenNewtonsoftSupport();
-    }
+            Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly).
+                ToList().
+                ForEach(xml => options.IncludeXmlComments(xml, includeControllerXmlComments: true));
+        }).
+        AddSwaggerGenNewtonsoftSupport().
+        AddHealthChecks().
+        AddNpgSql(builder.Configuration.GetConnectionString("PostgreSql")).
+        AddMongoDb(builder.Configuration["MongoDb:ConnectionString"]).
+        AddDiskStorageHealthCheck(null).
+        AddPrivateMemoryHealthCheck(367001600).
+        AddProcessAllocatedMemoryHealthCheck(1).
+        ForwardToPrometheus();
 
     var app = builder.Build();
 
     app.Services.GetService<ILoggerFactory>().AddSerilog();
-
-    var appLifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
-    appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+    app.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopped.Register(Log.CloseAndFlush);
 
     app.UseSerilogRequestLogging(options =>
     {
@@ -128,35 +121,30 @@ try
             if (!string.IsNullOrEmpty(userId))
                 diagnosticContext.Set("UserId", userId);
         };
-    });
-
-    if (builder.Environment.IsDevelopment())
+    }).
+    UseSwagger(c =>
     {
-        app.UseSwagger(c =>
-        {
-            c.SerializeAsV2 = true;
-            c.RouteTemplate = "swagger/{documentName}/swagger.json";
-        }).
-        UseSwaggerUI(c =>
-        {
-            c.SwaggerEndpoint("v1/swagger.json", "E-Commerce API V1");
-        });
-    }
+        c.SerializeAsV2 = true;
+        c.RouteTemplate = "swagger/{documentName}/swagger.json";
+    }).
+    UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("v1/swagger.json", "E-Commerce API V1");
+    }).
+    UseResponseCompression().
+    UseAuthentication().
+    UseRouting().
+    UseCors("CorsPolicy").
+    UseAuthorization().
+    UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
 
-    app.UseResponseCompression().
-        UseAuthentication().
-        UseRouting().
-        UseCors("CorsPolicy").
-        UseAuthorization().
-        UseEndpoints(endpoints =>
+        endpoints.MapHealthChecks("/api/health", new HealthCheckOptions()
         {
-            endpoints.MapControllers();
-
-            endpoints.MapHealthChecks("/api/health", new HealthCheckOptions()
-            {
-                ResultStatusCodes = { [HealthStatus.Healthy] = StatusCodes.Status200OK, [HealthStatus.Degraded] = StatusCodes.Status200OK, [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable }
-            });
+            ResultStatusCodes = { [HealthStatus.Healthy] = StatusCodes.Status200OK, [HealthStatus.Degraded] = StatusCodes.Status200OK, [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable }
         });
+    });
 
     app.Run();
 

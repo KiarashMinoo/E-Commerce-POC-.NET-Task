@@ -14,7 +14,7 @@ namespace Application.CQRS.Customers.Commands.Create
 
         public async Task<CreateCustomerCommandResultDto> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
         {
-            var customer = new Customer(request.FullName, request.EMail, request.Cell);
+            var customer = new Customer(request.FullName, request.EMail, request.Cell, repository, repository);
             customer = await repository.AddAsync(customer, cancellationToken);
             customer = customer.CustomerAddedEvent();
 

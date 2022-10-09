@@ -1,41 +1,56 @@
-﻿using Application.Data;
+﻿using Application.CQRS.Customers.Commands.Create;
+using Application.Data;
 using Domain.Customers;
+using Domain.Products;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure
 {
-    public class PostgreSqlContext : DbContext, IPostgreSqlContext
+    internal class PostgreSqlContext : DbContext, IPostgreSqlContext
     {
-        private static readonly object mutex = new();
+        private static bool isMigrating = false;
+        private static bool migrated = false;
+
+        private readonly IMediator mediator;
 
         public DbSet<Customer> Customers { get; set; } = null!;
 
-        public PostgreSqlContext(DbContextOptions<PostgreSqlContext> options) : base(options)
+        public DbSet<Product> Products { get; set; } = null!;
+
+        public PostgreSqlContext(DbContextOptions<PostgreSqlContext> options, IMediator mediator) : base(options)
         {
-            Migrate();
+            MigrateAsync().Wait();
+            this.mediator = mediator;
         }
 
-        private void Migrate()
+        private async Task MigrateAsync()
         {
             var pendingMigrations = Database.GetPendingMigrations();
-            if (pendingMigrations.Any())
+            if (pendingMigrations.Any() && !migrated)
             {
-                lock (mutex)
+                if (isMigrating)
                 {
-                    Database.Migrate();
+                    while (!migrated)
+                        await Task.Delay(10);
 
-                    Seed();
+                    return;
                 }
+
+                isMigrating = true;
+
+                await Database.MigrateAsync();
+                await SeedAsync();
+
+                isMigrating = false;
+                migrated = true;
             }
         }
 
-        private void Seed()
+        private async Task SeedAsync()
         {
-            if (!Customers.Any(a => a.EMail == "ielmeligy@creativeadvtech.com"))
-                Customers.Add(new Customer("Ibrahim Elmeligy", "ielmeligy@creativeadvtech.com", "+971 56 506 5300"));
-
-            if (!Customers.Any(a => a.EMail == "ahmadminoo@gmail.com"))
-                Customers.Add(new Customer("Ahmad(Kia) Minoo", "ahmadminoo@gmail.com", "+989 12 339 4363"));
+            await mediator.Send(new CreateCustomerCommand("Ibrahim Elmeligy", "ielmeligy@creativeadvtech.com", "+971 56 506 5300"));
+            await mediator.Send(new CreateCustomerCommand("Ahmad(Kia) Minoo", "ahmadminoo@gmail.com", "+989 12 339 4363"));
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

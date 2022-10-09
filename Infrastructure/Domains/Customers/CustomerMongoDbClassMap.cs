@@ -11,8 +11,10 @@ namespace Infrastructure.Domains.Customers
                 BsonClassMap.RegisterClassMap<Customer>(cm =>
                 {
                     cm.AutoMap();
-                    cm.MapIdField(a => a.Id);
-                    cm.MapCreator(a => new Customer(a.Id, a.FullName, a.EMail, a.Cell));
+                    cm.MapIdProperty(a => a.Id);
+                    cm.MapProperty(a => a.FullName);
+                    cm.MapProperty(a => a.EMail);
+                    cm.MapProperty(a => a.Cell);
                 });
         }
     }

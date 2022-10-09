@@ -19,6 +19,12 @@ namespace Infrastructure.Domains.Customers
             return entry.Entity;
         }
 
+        public bool CustomerExistsByCell(Guid customerId, string cell)
+            => context.Customers.Any(a => a.Cell == cell && a.Id != customerId);
+
+        public bool CustomerExistsByEMail(Guid customerId, string eMail)
+            => context.Customers.Any(a => a.EMail == eMail && a.Id != customerId);
+
         public Task DeleteAsync(Customer customer, CancellationToken cancellationToken = default)
             => Task.Factory.StartNew(() => context.Customers.Remove(customer), cancellationToken);
 

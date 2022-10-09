@@ -7,13 +7,13 @@ namespace Domain.Products.BusinessRules
         private readonly Product product;
         private readonly int valueToSubract;
 
+        public string Message => $"The available quantity of product {product.Name} is {product.Quantity}, the amount of {valueToSubract} is more than avaiable quantity.";
+
         public ProductQuantityDecreasingQuantityLessThanZeroBusinessRule(Product product, int valueToSubract)
         {
             this.product = product;
             this.valueToSubract = valueToSubract;
         }
-
-        public string Message => $"The available quantity of product {product.Name} is {product.Quantity}, the amount of {valueToSubract} is more than avaiable quantity.";
 
         public bool IsBroken()
         {

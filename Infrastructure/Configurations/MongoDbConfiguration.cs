@@ -6,5 +6,6 @@
         public string DatabaseName { get; set; } = null!;
 
         public string CustomersCollectionName { get; set; } = null!;
+        public string ProductsCollectionName { get; set; } = null!;
     }
 }

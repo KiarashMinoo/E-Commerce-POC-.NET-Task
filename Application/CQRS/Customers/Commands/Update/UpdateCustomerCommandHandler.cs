@@ -16,7 +16,7 @@ namespace Application.CQRS.Customers.Commands.Update
         public async Task<UpdateCustomerCommandResultDto> Handle(UpdateCustomerCommand request, CancellationToken cancellationToken)
         {
             var customer = await repository.RetrieveAsync(request.Id, cancellationToken) ?? throw new EntityNotFoundException<Customer>();
-            customer = customer.Update(request.FullName, request.EMail, request.Cell);
+            customer = customer.Update(request.FullName, request.EMail, request.Cell, repository, repository);
             customer = customer.CustomerUpdatedEvent();
 
             var rtn = new UpdateCustomerCommandResultDto() { Id = customer.Id };
