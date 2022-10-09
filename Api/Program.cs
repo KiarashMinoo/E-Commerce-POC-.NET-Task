@@ -121,7 +121,10 @@ try
                     },
                     new List<string>()
                 }
-                });
+            });
+
+            options.MapType(typeof(IFormFile), () => new OpenApiSchema() { Type = "file", Format = "binary" });
+            options.MapType<DateTime>(() => new OpenApiSchema { Type = "string", Format = "date" });
 
             Directory.GetFiles(AppContext.BaseDirectory, "*.xml", SearchOption.TopDirectoryOnly).
                 ToList().
