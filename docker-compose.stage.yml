@@ -11,14 +11,15 @@ services:
     networks:
       - postgresql
       - mongodb
-      - api
       - elastic
+      - api
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     depends_on:
       - pgbouncer
       - mongodb-master
+      - elasticsearch-master
     environment:
       - ASPNETCORE_ENVIRONMENT=Stage
       - ASPNETCORE_URLS=https://+:443;http://+:80
