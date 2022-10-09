@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Data
 {
-    public interface IPostgreSqlContext : IContext
+    public interface IPostgreSqlContext
     {
         DbSet<Customer> Customers { get; }
 
