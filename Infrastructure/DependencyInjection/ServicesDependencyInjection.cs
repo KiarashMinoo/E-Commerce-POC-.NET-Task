@@ -1,6 +1,7 @@
 ﻿using Application.CQRS.Customers.Commands.Create;
 using Application.CQRS.Customers.Queries.ListAll;
 using BuildingBlocks.Application.Data;
+using BuildingBlocks.Infrastructure.DependencyInjection;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

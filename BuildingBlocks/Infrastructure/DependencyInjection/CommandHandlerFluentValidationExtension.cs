@@ -1,9 +1,10 @@
 ﻿using BuildingBlocks.Infrastructure.Mediatr;
 using FluentValidation;
 using MediatR.Pipeline;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace BuildingBlocks.Infrastructure.DependencyInjection
 {
     public static class CommandHandlerFluentValidationExtension
     {

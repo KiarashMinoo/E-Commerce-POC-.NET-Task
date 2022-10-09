@@ -1,7 +1,8 @@
 ﻿using BuildingBlocks.Infrastructure.Mediatr;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace BuildingBlocks.Infrastructure.DependencyInjection
 {
     public static class CommandHandlerUnitOfWorkExtension
     {

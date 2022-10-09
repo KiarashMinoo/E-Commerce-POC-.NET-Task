@@ -1,0 +1,45 @@
+version: '3.4'
+
+services:
+  ecommerce:
+    image: ${DOCKER_REGISTRY-}ecommerce
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure
+    hostname: ecommerce
+    networks:
+      - postgresql
+      - mongodb
+      - api
+      - elastic
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - pgbouncer
+      - mongodb-master
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Stage
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - TZ=Asia/Tehran
+      - PGTZ=Asia/Tehran  
+    deploy: 
+      replicas: 3
+
+  ecommerce-nginx:
+    image: bitnami/openresty:latest
+    restart: on-failure    
+    ports: 
+      - "8080:80"  
+    networks:      
+      - api
+    volumes:       
+      - ./nginx.conf:/etc/openresty/nginx.conf:ro
+    links:
+      - ecommerce
+    depends_on:
+      - ecommerce
+    environment:      
+      - TZ=Asia/Tehran
+      - PGTZ=Asia/Tehran    

@@ -1,4 +1,4 @@
-﻿using AloNBS.BuildingBlocks.Application.Attributes;
+﻿using BuildingBlocks.Application.Attributes;
 using BuildingBlocks.Application.CQRS.Commands;
 using BuildingBlocks.Application.Data;
 using MediatR;

@@ -25,9 +25,14 @@ try
                 builder.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, true);
 
             builder.AddEnvironmentVariables().AddCommandLine(args);
-        });
+        }).
+        UseSerilog();
 
-    Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(builder.Configuration).CreateLogger();
+    Log.Logger = new LoggerConfiguration().
+        ReadFrom.
+        Configuration(builder.Configuration).
+        Enrich.FromLogContext().
+        CreateLogger();
 
     // Add services to the container.
     builder.Services.
