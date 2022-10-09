@@ -53,7 +53,8 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran     
-    deploy: 2     
+    deploy: 
+      replicas: 2
 
   pgbouncer:
     image: edoburu/pgbouncer:latest
@@ -143,9 +144,10 @@ services:
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran  
-    deploy: 3
+    deploy: 
+      replicas: 3
 
-  portfolio-nginx:
+  ecommerce-nginx:
     image: bitnami/openresty:latest
     restart: on-failure    
     ports: 
@@ -155,9 +157,9 @@ services:
     volumes:       
       - ./nginx.conf:/etc/openresty/nginx.conf:ro
     links:
-      - api
+      - ecommerce
     depends_on:
-      - api
+      - ecommerce
     environment:      
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran    

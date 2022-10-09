@@ -31,7 +31,7 @@ try
 
     // Add services to the container.
     builder.Services.
-        AddServices()
+        AddServices().
         AddDbServices().
         AddLogging(options => options.AddSerilog(dispose: true)).
         Configure<BrotliCompressionProviderOptions>(options => { options.Level = CompressionLevel.Optimal; }).
