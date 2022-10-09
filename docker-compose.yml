@@ -15,6 +15,8 @@ volumes:
     driver: local
   mongodb-slave-data:
     driver: local
+  mongodb-arbiter-data:
+    driver: local
   elasticsearch-master-data:
     driver: local
   elasticsearch-slave-data:
@@ -27,7 +29,7 @@ services:
     networks:
       - postgresql
     volumes:
-       - postgres-master-data:/bitnami/postgresql       
+       - postgres-master-data:/bitnami/postgresql        
     environment:
       - POSTGRESQL_REPLICATION_MODE=master
       - POSTGRESQL_REPLICATION_USER=repl_user_postgres
@@ -59,7 +61,7 @@ services:
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran     
     deploy: 
-      replicas: 2
+      replicas: 1
 
   pgbouncer:
     image: edoburu/pgbouncer:latest
@@ -84,7 +86,7 @@ services:
     networks:
       - mongodb    
     volumes:
-      - mongodb-master-data:/bitnami/data
+      - mongodb-master-data:/bitnami/mongodb 
     environment:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-master
       - MONGODB_REPLICA_SET_MODE=primary
@@ -100,6 +102,8 @@ services:
       - mongodb
     depends_on:
       - mongodb-master
+    volumes:
+      - mongodb-slave-data:/bitnami/mongodb 
     environment:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-slave
       - MONGODB_REPLICA_SET_MODE=secondary
@@ -109,7 +113,7 @@ services:
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran   
     deploy:
-      replicas: 2
+      replicas: 1
 
   mongodb-arbiter:
     image: bitnami/mongodb:latest    
@@ -118,6 +122,8 @@ services:
       - mongodb
     depends_on:
       - mongodb-master
+    volumes:
+      - mongodb-arbiter-data:/bitnami/mongodb 
     environment:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
       - MONGODB_REPLICA_SET_MODE=arbiter
