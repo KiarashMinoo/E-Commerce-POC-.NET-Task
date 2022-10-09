@@ -19,7 +19,7 @@ namespace Application.Helpers
 
             async Task WriteStreamAsync(string fileName, Stream stream)
             {
-                using var fileStream = File.Create(fileName);
+                using var fileStream = File.Create(Path.Combine(Directory.GetCurrentDirectory(), fileName));
 
                 stream.Position = 0;
                 stream.Seek(0, SeekOrigin.Begin);
@@ -30,20 +30,20 @@ namespace Application.Helpers
 
             async Task<string> WriteDocumentAsync(string identity)
             {
-                var path = Path.Combine(Directory.GetCurrentDirectory(), Storage);
+                var path = Path.Combine(Storage);
                 CheckDirectoryExists(path);
                 var fileName = Path.Combine(path, $"{identity}.{extension}");
                 await WriteStreamAsync(fileName, stream);
-                return fileName;
+                return fileName.Replace('\\', '/');
             }
 
             async Task<string> WriteThumbnailAsync(string identity, Stream thumbnail)
             {
-                var path = Path.Combine(Directory.GetCurrentDirectory(), Storage, "Thumbnails");
+                var path = Path.Combine(Storage, "Thumbnails");
                 CheckDirectoryExists(path);
                 var fileName = Path.Combine(path, $"{identity}.{extension}");
                 await WriteStreamAsync(fileName, thumbnail);
-                return fileName;
+                return fileName.Replace('\\', '/');
             }
 
             string? thumbnail = null;

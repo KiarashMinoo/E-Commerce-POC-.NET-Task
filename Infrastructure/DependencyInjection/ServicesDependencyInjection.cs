@@ -18,6 +18,7 @@ namespace Infrastructure.DependencyInjection
             services.AddMediatR(typeof(CreateCustomerCommand).Assembly);
             services.AddCommandHandlerFluentValidation(new[] { typeof(CreateCustomerCommandValidator).Assembly });
             services.AddCommandHandlerUnitOfWork();
+            services.AddCommandHandlerEntityEvent();
 
             var automapperAssemblies = new List<Assembly>() { typeof(ListAllCustomerQuery).Assembly };
             services.AddAutoMapper(automapperAssemblies.ToArray());
