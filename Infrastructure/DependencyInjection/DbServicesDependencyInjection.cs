@@ -8,11 +8,11 @@ using Infrastructure.Domains.Customers;
 using Infrastructure.Domains.Products;
 using Infrastructure.Domains.Receipts;
 using Infrastructure.Domains.Users;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Diagnostics;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -27,12 +27,6 @@ namespace Infrastructure.DependencyInjection
             {
                 options.UseNpgsql(configuration.GetConnectionString(postgreSqlConnectionStringName));
             });
-
-            if (!Debugger.IsAttached)
-            {
-                var provider = services.BuildServiceProvider();
-                provider.GetRequiredService<IPostgreSqlContext>().MigrateAsync();
-            }
 
             //MongoDb Config
             services.Configure<MongoDbConfiguration>(configuration.GetSection(mongoDbSectionName));
@@ -51,6 +45,14 @@ namespace Infrastructure.DependencyInjection
             services.TryAddScoped<IReceiptRepository, ReceiptRepository>();
 
             return services;
+        }
+
+        public static IApplicationBuilder UseDbServices(this IApplicationBuilder app)
+        {
+            var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            serviceScope.ServiceProvider.GetRequiredService<IPostgreSqlContext>().MigrateAsync();
+
+            return app;
         }
     }
 }

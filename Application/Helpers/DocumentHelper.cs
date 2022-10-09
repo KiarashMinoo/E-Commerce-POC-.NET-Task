@@ -40,6 +40,7 @@ namespace Application.Helpers
             async Task<string> WriteThumbnailAsync(string identity, Stream thumbnail)
             {
                 var path = Path.Combine(Directory.GetCurrentDirectory(), Storage, "Thumbnails");
+                CheckDirectoryExists(path);
                 var fileName = Path.Combine(path, $"{identity}.{extension}");
                 await WriteStreamAsync(fileName, thumbnail);
                 return fileName;

@@ -133,7 +133,7 @@ try
         AddMongoDb(builder.Configuration["MongoDb:ConnectionString"]).
         AddDiskStorageHealthCheck(null).
         AddPrivateMemoryHealthCheck(367001600).
-        AddProcessAllocatedMemoryHealthCheck(1).
+        AddProcessAllocatedMemoryHealthCheck(16).
         ForwardToPrometheus();
 
     var app = builder.Build();
@@ -141,39 +141,41 @@ try
     app.Services.GetService<ILoggerFactory>().AddSerilog();
     app.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopped.Register(Log.CloseAndFlush);
 
-    app.UseSerilogRequestLogging(options =>
-    {
-        options.EnrichDiagnosticContext = (IDiagnosticContext diagnosticContext, HttpContext httpContext) =>
+    app.
+        UseDbServices().
+        UseSerilogRequestLogging(options =>
         {
-            var userId = httpContext.User.FindFirst("sid")?.Value;
-            if (!string.IsNullOrEmpty(userId))
-                diagnosticContext.Set("UserId", userId);
-        };
-    }).
-    UseSwagger(c =>
-    {
-        c.SerializeAsV2 = true;
-        c.RouteTemplate = "swagger/{documentName}/swagger.json";
-    }).
-    UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("v1/swagger.json", "E-Commerce API V1");
-    }).
-    UseResponseCompression().
-    UseFileServer().
-    UseAuthentication().
-    UseRouting().
-    UseCors("CorsPolicy").
-    UseAuthorization().
-    UseEndpoints(endpoints =>
-    {
-        endpoints.MapControllers();
+            options.EnrichDiagnosticContext = (IDiagnosticContext diagnosticContext, HttpContext httpContext) =>
+            {
+                var userId = httpContext.User.FindFirst("sid")?.Value;
+                if (!string.IsNullOrEmpty(userId))
+                    diagnosticContext.Set("UserId", userId);
+            };
+        }).
+        UseSwagger(c =>
+        {
+            c.SerializeAsV2 = true;
+            c.RouteTemplate = "swagger/{documentName}/swagger.json";
+        }).
+        UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("v1/swagger.json", "E-Commerce API V1");
+        }).
+        UseResponseCompression().
+        UseFileServer().
+        UseAuthentication().
+        UseRouting().
+        UseCors("CorsPolicy").
+        UseAuthorization().
+        UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
 
-        endpoints.MapHealthChecks("/api/health", new HealthCheckOptions()
-        {
-            ResultStatusCodes = { [HealthStatus.Healthy] = StatusCodes.Status200OK, [HealthStatus.Degraded] = StatusCodes.Status200OK, [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable }
+            endpoints.MapHealthChecks("/api/health", new HealthCheckOptions()
+            {
+                ResultStatusCodes = { [HealthStatus.Healthy] = StatusCodes.Status200OK, [HealthStatus.Degraded] = StatusCodes.Status200OK, [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable }
+            });
         });
-    });
 
     app.Run();
 
