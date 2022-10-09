@@ -6,7 +6,6 @@ using Domain.Products;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace Infrastructure
 {
@@ -25,15 +24,10 @@ namespace Infrastructure
         {
             this.logger = logger;
             this.mediator = mediator;
-
-            MigrateAsync().Wait();
         }
 
-        public async Task MigrateAsync()
+        public async Task MigrateAsync(CancellationToken cancellationToken = default)
         {
-            if (Debugger.IsAttached)
-                return;
-
             try
             {
                 if (!migrated && !isMigrating)
@@ -41,15 +35,15 @@ namespace Infrastructure
                     if (isMigrating)
                     {
                         while (!migrated)
-                            await Task.Delay(10);
+                            await Task.Delay(10, cancellationToken);
 
                         return;
                     }
 
                     isMigrating = true;
 
-                    await Database.MigrateAsync();
-                    await SeedAsync();
+                    await Database.MigrateAsync(cancellationToken: cancellationToken);
+                    await SeedAsync(cancellationToken);
 
                     isMigrating = false;
                     migrated = true;
@@ -61,10 +55,10 @@ namespace Infrastructure
             }
         }
 
-        private async Task SeedAsync()
+        private async Task SeedAsync(CancellationToken cancellationToken = default)
         {
-            await mediator.Send(new CreateCustomerCommand("Ibrahim Elmeligy", "ielmeligy@creativeadvtech.com", "+971565065300"));
-            await mediator.Send(new CreateCustomerCommand("Ahmad(Kia) Minoo", "ahmadminoo@gmail.com", "+989123394363"));
+            await mediator.Send(new CreateCustomerCommand("Ibrahim Elmeligy", "ielmeligy@creativeadvtech.com", "+971565065300"), cancellationToken);
+            await mediator.Send(new CreateCustomerCommand("Ahmad(Kia) Minoo", "ahmadminoo@gmail.com", "+989123394363"), cancellationToken);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
