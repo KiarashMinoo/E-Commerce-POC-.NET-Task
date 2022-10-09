@@ -97,7 +97,7 @@ services:
     environment:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-master
       - MONGODB_REPLICA_SET_MODE=primary
-      - MONGODB_ROOT_PASSWORD=repl_password_P@ssW0rd
+      - MONGODB_ROOT_PASSWORD=repl_password_PassW0rd
       - MONGODB_REPLICA_SET_KEY=replicasetkey123
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran      
@@ -115,7 +115,7 @@ services:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-slave
       - MONGODB_REPLICA_SET_MODE=secondary
       - MONGODB_INITIAL_PRIMARY_HOST=mongodb-master
-      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=repl_password_P@ssW0rd
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=repl_password_PassW0rd
       - MONGODB_REPLICA_SET_KEY=replicasetkey123      
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran   
@@ -135,7 +135,7 @@ services:
       - MONGODB_ADVERTISED_HOSTNAME=mongodb-arbiter
       - MONGODB_REPLICA_SET_MODE=arbiter
       - MONGODB_INITIAL_PRIMARY_HOST=mongodb-master
-      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=repl_password_P@ssW0rd
+      - MONGODB_INITIAL_PRIMARY_ROOT_PASSWORD=repl_password_PassW0rd
       - MONGODB_REPLICA_SET_KEY=replicasetkey123      
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran  
