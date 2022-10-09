@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Diagnostics;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -22,6 +23,12 @@ namespace Infrastructure.DependencyInjection
             {
                 options.UseNpgsql(configuration.GetConnectionString(postgreSqlConnectionStringName));
             });
+
+            if (!Debugger.IsAttached)
+            {
+                var provider = services.BuildServiceProvider();
+                provider.GetRequiredService<IPostgreSqlContext>().MigrateAsync();
+            }
 
             //MongoDb Config
             services.Configure<MongoDbConfiguration>(configuration.GetSection(mongoDbSectionName));

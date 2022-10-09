@@ -1,4 +1,3 @@
-using Application.Data;
 using Infrastructure.DependencyInjection;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -9,7 +8,6 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Prometheus;
 using Serilog;
-using System.Diagnostics;
 using System.IO.Compression;
 
 try
@@ -115,12 +113,6 @@ try
         AddPrivateMemoryHealthCheck(367001600).
         AddProcessAllocatedMemoryHealthCheck(1).
         ForwardToPrometheus();
-
-    if (!Debugger.IsAttached)
-    {
-        var provider = builder.Services.BuildServiceProvider();
-        provider.GetRequiredService<IPostgreSqlContext>().MigrateAsync();
-    }
 
     var app = builder.Build();
 

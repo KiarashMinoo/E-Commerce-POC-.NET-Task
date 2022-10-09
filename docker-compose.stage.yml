@@ -23,6 +23,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Stage
       - ASPNETCORE_URLS=https://+:443;http://+:80
+      - SEEDS=true
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran  
     deploy: 
