@@ -6,6 +6,8 @@ namespace Domain.Receipts
 {
     public class Receipt : EntityBase, IAggregateRoot
     {
+        public Guid Id { get; }
+
         public Guid CustomerId { get; }
         public Customer Customer { get; } = null!;
 
@@ -14,15 +16,16 @@ namespace Domain.Receipts
 
         public int Quantity { get; }
 
-        private Receipt()
-        {
-        }
+        public decimal UnitPrice { get; }
 
-        public Receipt(Guid customerId, Guid productId, int quantity)
+        private Receipt() => Id = Guid.NewGuid();
+
+        public Receipt(Guid customerId, Guid productId, int quantity, decimal unitPrice)
         {
             CustomerId = customerId;
             ProductId = productId;
             Quantity = quantity;
+            UnitPrice = unitPrice;
         }
     }
 }

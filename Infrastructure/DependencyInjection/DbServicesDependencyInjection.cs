@@ -1,10 +1,12 @@
 ﻿using Application.Data;
 using Domain.Customers;
 using Domain.Products;
+using Domain.Receipts;
 using Domain.Users;
 using Infrastructure.Configurations;
 using Infrastructure.Domains.Customers;
 using Infrastructure.Domains.Products;
+using Infrastructure.Domains.Receipts;
 using Infrastructure.Domains.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -46,6 +48,7 @@ namespace Infrastructure.DependencyInjection
             services.TryAddScoped<IMongoDbProductRepository, MongoDbProductRepository>();
 
             services.TryAddScoped<IUserRepository, UserRepository>();
+            services.TryAddScoped<IReceiptRepository, ReceiptRepository>();
 
             return services;
         }
