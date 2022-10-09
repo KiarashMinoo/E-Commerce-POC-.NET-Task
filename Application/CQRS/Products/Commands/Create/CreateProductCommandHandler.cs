@@ -15,7 +15,7 @@ namespace Application.CQRS.Products.Commands.Create
 
         public async Task<CreateProductCommandResultDto> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
-            var documents = await request.Image.StoreDocumentAsync(".png", true, cancellationToken);
+            var documents = await request.Image.StoreDocumentAsync("png", true, cancellationToken);
             var customer = new Product(request.Name, request.Quantity, request.Price, documents.Path, documents.ThumbnailPath!, repository);
             customer = await repository.AddAsync(customer, cancellationToken);
             customer = customer.ProductAddedEvent();
