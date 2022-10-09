@@ -10,14 +10,17 @@ namespace Application.CQRS.Products.Commands.Update
 
         public int Quantity { get; }
 
-        public decimal Price { get; }       
+        public decimal Price { get; }
 
-        public UpdateProductCommand(Guid id, string name, int quantity, decimal price)
+        public Stream? Image { get; }
+
+        public UpdateProductCommand(Guid id, string name, int quantity, decimal price, Stream? image)
         {
             Id = id;
             Name = name;
             Quantity = quantity;
             Price = price;
+            Image = image;
         }
     }
 }

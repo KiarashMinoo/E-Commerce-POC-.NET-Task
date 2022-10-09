@@ -15,25 +15,33 @@ namespace Domain.Products
 
         public decimal Price { get; private set; }
 
+        public string Image { get; private set; } = null!;
+
+        public string Thumbnail { get; private set; } = null!;
+
         //Used For Ef
         private Product() => Id = Guid.NewGuid();
 
-        public Product(string name, int quantity, decimal price, IProductNameMustBeUniqueHandler nameHandler) : this()
+        public Product(string name, int quantity, decimal price, string image, string thumbnail, IProductNameMustBeUniqueHandler nameHandler) : this()
         {
             CheckBusinessRule(new ProductNameMustBeUniqueBusinessRule(nameHandler, Id, name));
 
             Name = name;
             Quantity = quantity;
             Price = price;
+            Image = image;
+            Thumbnail = thumbnail;
         }
 
-        public Product Update(string name, int quantity, decimal price, IProductNameMustBeUniqueHandler nameHandler)
+        public Product Update(string name, int quantity, decimal price, string image, string thumbnail, IProductNameMustBeUniqueHandler nameHandler)
         {
             CheckBusinessRule(new ProductNameMustBeUniqueBusinessRule(nameHandler, Id, name));
 
             Name = name;
             Quantity = quantity;
             Price = price;
+            Image = image;
+            Thumbnail = thumbnail;
 
             return this;
         }

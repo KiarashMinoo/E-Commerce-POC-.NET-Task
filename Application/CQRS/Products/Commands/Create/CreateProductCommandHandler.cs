@@ -1,4 +1,5 @@
-﻿using BuildingBlocks.Application.CQRS.Commands;
+﻿using Application.Helpers;
+using BuildingBlocks.Application.CQRS.Commands;
 using Domain.Products;
 
 namespace Application.CQRS.Products.Commands.Create
@@ -14,7 +15,8 @@ namespace Application.CQRS.Products.Commands.Create
 
         public async Task<CreateProductCommandResultDto> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
-            var customer = new Product(request.Name, request.Quantity, request.Price, repository);
+            var documents = await request.Image.StoreDocumentAsync(".png", true, cancellationToken);
+            var customer = new Product(request.Name, request.Quantity, request.Price, documents.Path, documents.ThumbnailPath!, repository);
             customer = await repository.AddAsync(customer, cancellationToken);
             customer = customer.ProductAddedEvent();
 

@@ -132,6 +132,7 @@ try
         c.SwaggerEndpoint("v1/swagger.json", "E-Commerce API V1");
     }).
     UseResponseCompression().
+    UseFileServer().
     UseAuthentication().
     UseRouting().
     UseCors("CorsPolicy").
