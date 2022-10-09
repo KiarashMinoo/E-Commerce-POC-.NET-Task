@@ -39,7 +39,7 @@ namespace Api.Controllers
             return mediator.Send(new UpdateProductCommand(id, dto.Name, dto.Quantity, dto.Price, dto.Image?.OpenReadStream()), cancellationToken);
         }
 
-        [HttpPut("{id:Guid}")]
+        [HttpDelete("{id:Guid}")]
         [Authorize]
         public Task<DeleteProductCommandResultDto> DeleteAsync([FromServices] IMediator mediator, [FromRoute] Guid id, CancellationToken cancellationToken = default)
             => mediator.Send(new DeleteProductCommand(id), cancellationToken);

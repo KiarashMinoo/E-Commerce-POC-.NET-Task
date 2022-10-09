@@ -25,7 +25,7 @@ namespace Api.Controllers
         public Task<UpdateCustomerCommandResultDto> UpdateAsync([FromServices] IMediator mediator, [FromRoute] Guid id, [FromBody] CustomerUpsertDto dto, CancellationToken cancellationToken = default)
             => mediator.Send(new UpdateCustomerCommand(id, dto.FullName, dto.EMail, dto.Cell), cancellationToken);
 
-        [HttpPut("{id:Guid}")]
+        [HttpDelete("{id:Guid}")]
         [Authorize]
         public Task<DeleteCustomerCommandResultDto> DeleteAsync([FromServices] IMediator mediator, [FromRoute] Guid id, CancellationToken cancellationToken = default)
             => mediator.Send(new DeleteCustomerCommand(id), cancellationToken);
