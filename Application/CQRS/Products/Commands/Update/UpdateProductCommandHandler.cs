@@ -23,7 +23,7 @@ namespace Application.CQRS.Products.Commands.Update
                 if (!string.IsNullOrEmpty(customer.Image))
                     fileName = customer.Image.Split(new[] { '/', '\\' }, StringSplitOptions.RemoveEmptyEntries).Last().Split(new[] { '.' }).First();
 
-                var documents = await request.Image.StoreDocumentAsync(fileName, ".png", true, cancellationToken);
+                var documents = await request.Image.StoreDocumentAsync(fileName, "png", true, cancellationToken);
                 customer = customer.Update(request.Name, request.Quantity, request.Price, documents.Path, documents.ThumbnailPath!, repository);
             }
             else
