@@ -21,23 +21,28 @@ services:
       - mongodb-primary
       - elasticsearch-master
     environment:
-      - ASPNETCORE_ENVIRONMENT=Stage
-      - ASPNETCORE_URLS=https://+:443;http://+:80
-      - SEEDS=true
+      - ASPNETCORE_ENVIRONMENT=Stage            
       - TZ=Asia/Tehran
       - PGTZ=Asia/Tehran  
+    healthcheck:
+       test: ["CMD", "curl", "-f", "http://localhost:80/api/health"]
+       interval: 10s
+       retries: 10
+       start_period: 5s
+       timeout: 3s
     deploy: 
       replicas: 3
 
   ecommerce-nginx:
     image: bitnami/openresty:latest
-    restart: on-failure    
+    restart: on-failure   
+    user: root
     ports: 
-      - "8080:80"  
+      - 8080:80
     networks:      
       - api
     volumes:       
-      - ./nginx.conf:/etc/openresty/nginx.conf:ro
+      - "./nginx.conf:/etc/openresty/nginx.conf:ro"
     links:
       - ecommerce
     depends_on:
