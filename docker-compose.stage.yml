@@ -6,16 +6,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: on-failure
-    hostname: ecommerce
+    restart: always    
     networks:
       - postgresql
       - mongodb
       - elastic
-      - api
-    volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+      - api   
     depends_on:
       - pgbouncer
       - mongodb-primary

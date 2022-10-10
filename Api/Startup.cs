@@ -239,6 +239,8 @@ namespace Api
                         ResultStatusCodes = { [HealthStatus.Healthy] = StatusCodes.Status200OK, [HealthStatus.Degraded] = StatusCodes.Status200OK, [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable }
                     });
                 });
+
+            Console.WriteLine("Application Started");
         }
     }
 }

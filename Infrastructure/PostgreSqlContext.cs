@@ -32,6 +32,7 @@ namespace Infrastructure
         {
             this.logger = logger;
             this.mediator = mediator;
+            logger.LogInformation(Database.GetConnectionString());
         }
 
         public async Task MigrateAsync(CancellationToken cancellationToken = default)

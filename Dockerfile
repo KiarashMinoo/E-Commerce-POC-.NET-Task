@@ -8,8 +8,7 @@ ENV http_proxy="http://192.168.1.10:1080"
 ENV https_proxy="http://192.168.1.10:1080"
 ENV no_proxy="*192.168.1.200:8080"
 
-RUN apt-get update
-RUN apt-get -y install curl
+RUN apt-get update && apt-get install -y libfontconfig1 && apt-get install -y curl
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 ENV http_proxy="http://192.168.1.10:1080"
