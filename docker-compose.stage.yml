@@ -6,12 +6,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: always    
+    restart: always
     networks:
       - postgresql
       - mongodb
       - elastic
-      - api   
+      - api
+    volumes:
+      - "./wwwroot:/app/wwwroot:rw"
     depends_on:
       - pgbouncer
       - mongodb-primary
