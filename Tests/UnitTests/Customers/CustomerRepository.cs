@@ -33,6 +33,13 @@ namespace UnitTests.Customers
                 {
                     return _customers.FirstOrDefault(a => a.EMail == eMail);
                 });
+
+            postgreMock.
+                Setup(a => a.DeleteAsync(It.IsAny<Customer>(), It.IsAny<CancellationToken>())).
+                Returns((Customer customer, CancellationToken cancellationToken) =>
+                {
+                    _customers.Remove(customer);
+                });
         }
     }
 }

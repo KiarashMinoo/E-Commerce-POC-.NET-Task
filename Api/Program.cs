@@ -1,9 +1,12 @@
+using Api.Controllers;
 using Application.Services.Token;
 using Infrastructure.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
@@ -56,7 +59,7 @@ try
         AddCors(options =>
         {
             options.AddPolicy("CorsPolicy",
-                builder => builder.WithOrigins("http://localhost:4200", "https://localhost:4200", "*")
+                builder => builder
                     .AllowCredentials() //Note:  The URL must be specified without a trailing slash (/).
                     .AllowAnyMethod()
                     .AllowAnyHeader()
@@ -64,7 +67,11 @@ try
         }).
         AddHttpContextAccessor().
         AddSingleton(jwtConfiguration).
-        AddAuthentication().
+        AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).
         AddJwtBearer(options =>
         {
             options.TokenValidationParameters = new TokenValidationParameters
@@ -77,6 +84,8 @@ try
                 ValidAudience = jwtConfiguration.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.Key))
             };
+
+            options.Challenge = "token is required";
         }).
         Services.
         AddControllers().
@@ -136,7 +145,7 @@ try
         AddMongoDb(builder.Configuration["MongoDb:ConnectionString"]).
         AddDiskStorageHealthCheck(null).
         AddPrivateMemoryHealthCheck(367001600).
-        AddProcessAllocatedMemoryHealthCheck(16).
+        AddProcessAllocatedMemoryHealthCheck(367001600).
         ForwardToPrometheus();
 
     var app = builder.Build();
@@ -165,7 +174,43 @@ try
             c.SwaggerEndpoint("v1/swagger.json", "E-Commerce API V1");
         }).
         UseResponseCompression().
-        UseFileServer().
+        UseFileServer(new FileServerOptions()
+        {
+            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+            RequestPath = new PathString("/wwwroot")
+        }).
+        UseFileServer(new FileServerOptions()
+        {
+            FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+            RequestPath = new PathString("/_ui/wwwroot")
+        }).
+        UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new EmbeddedFileProvider(typeof(ProductController).Assembly, "Api.wwwroot"),
+            RequestPath = "/_ui",
+            OnPrepareResponse = ctx =>
+            {
+                ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age=604800");
+            }
+        }).
+        UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new EmbeddedFileProvider(typeof(ProductController).Assembly, "Api.wwwroot.assets.dist"),
+            RequestPath = "/assets/dist",
+            OnPrepareResponse = ctx =>
+            {
+                ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age=604800");
+            }
+        }).
+        UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new EmbeddedFileProvider(typeof(ProductController).Assembly, "Api.wwwroot.assets.dist"),
+            RequestPath = "/_framework",
+            OnPrepareResponse = ctx =>
+            {
+                ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age=604800");
+            }
+        }).
         UseAuthentication().
         UseRouting().
         UseCors("CorsPolicy").

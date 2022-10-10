@@ -58,7 +58,7 @@ namespace Application.Helpers
                 using SKBitmap scaledBitmap = bitmap.Resize(new SKImageInfo(ThumbnailWidth, height), SKFilterQuality.Medium);
                 using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
 
-                thumbnail = await WriteThumbnailAsync(fileName, scaledImage.Encode().AsStream());
+                thumbnail = await WriteThumbnailAsync(fileName, scaledImage.Encode(SKEncodedImageFormat.Png, 100).AsStream());
             }
 
             var path = await WriteDocumentAsync(fileName);

@@ -49,6 +49,9 @@ namespace Domain.Products
         public Product IncreaseQuantity(int valueToAdded)
         {
             Quantity += valueToAdded;
+
+            ProductUpdatedEvent();
+
             return this;
         }
 
@@ -57,6 +60,8 @@ namespace Domain.Products
             CheckBusinessRule(new ProductQuantityDecreasingQuantityLessThanZeroBusinessRule(this, valueToSubtract));
 
             Quantity -= valueToSubtract;
+
+            ProductUpdatedEvent();
 
             return this;
         }

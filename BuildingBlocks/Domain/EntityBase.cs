@@ -11,7 +11,13 @@ namespace BuildingBlocks.Domain
 
         public void ClearDomainEvents() => _domainEvents?.Clear();
 
-        protected void AddDomainEvent(IDomainEvent domainEvent) => (_domainEvents ??= new HashSet<IDomainEvent>()).Add(domainEvent);
+        protected void AddDomainEvent(IDomainEvent domainEvent)
+        {
+            _domainEvents ??= new HashSet<IDomainEvent>();
+
+            if (!_domainEvents.Contains(domainEvent))
+                _domainEvents.Add(domainEvent);
+        }
 
         protected void CheckBusinessRule(IBusinessRule rule)
         {

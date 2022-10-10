@@ -29,12 +29,14 @@ namespace Application.CQRS.Receipts.Create
             var product = await productRepository.RetrieveAsync(request.ProductId, cancellationToken) ?? throw new EntityNotFoundException<Product>();
             var customer = await customerRepository.RetrieveAsync(Guid.Parse(customerId), cancellationToken) ?? throw new EntityNotFoundException<Customer>();
 
-            product = product.DecreaseQuantity(product.Quantity);
+            product = product.DecreaseQuantity(request.Quantity);            
 
             var receipt = new Receipt(customer.Id, product.Id, request.Quantity, product.Price);
             _ = await repository.AddAsync(receipt, cancellationToken);
 
-            return new CreateReceiptCommandResultDto() { Id = receipt.Id };
+            var rtn = new CreateReceiptCommandResultDto() { Id = receipt.Id };
+            rtn.SetEntity(product);
+            return rtn;
         }
     }
 }
