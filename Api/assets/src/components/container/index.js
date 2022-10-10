@@ -15,9 +15,11 @@ export class ECommerceContainer extends React.Component {
                 <a href="/swagger">Swagger</a>
                 <div>
                     {
-                        localStorage.getItem('Token') ?
-                            <Buy></Buy> :
-                            <Login></Login>
+                        localStorage.getItem("Token")
+                            ?
+                            <Buy></Buy>
+                            :
+                            <Login onLoggedIn={() => this.forceUpdate()}></Login>
                     }
                 </div>
             </div>

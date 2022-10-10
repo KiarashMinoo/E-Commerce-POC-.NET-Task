@@ -31,6 +31,7 @@ export class Login extends React.Component {
                 localStorage.setItem('UserId', response.data.id);
                 localStorage.setItem('UserName', response.data.userName);
                 localStorage.setItem('Token', response.data.token);
+                this.props.onLoggedIn(true)
             });
     }
 
