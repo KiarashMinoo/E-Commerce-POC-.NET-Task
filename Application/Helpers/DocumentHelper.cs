@@ -52,10 +52,10 @@ namespace Application.Helpers
             if (image != null && makeThumbnail)
             {
                 var bitmap = SKBitmap.FromImage(image);
-                var ratioFactor = ThumbnailWidth / bitmap.Width;
+                var ratioFactor = (ThumbnailWidth * 1.0m) / bitmap.Width;
                 var height = bitmap.Height * ratioFactor;
 
-                using SKBitmap scaledBitmap = bitmap.Resize(new SKImageInfo(ThumbnailWidth, height), SKFilterQuality.Medium);
+                using SKBitmap scaledBitmap = bitmap.Resize(new SKImageInfo(ThumbnailWidth, (int)height), SKFilterQuality.Medium);
                 using SKImage scaledImage = SKImage.FromBitmap(scaledBitmap);
 
                 thumbnail = await WriteThumbnailAsync(fileName, scaledImage.Encode(SKEncodedImageFormat.Png, 100).AsStream());

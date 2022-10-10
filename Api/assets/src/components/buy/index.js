@@ -47,7 +47,7 @@ export class Buy extends React.Component {
                 response.data.forEach(product => {
                     products.push({
                         productId: product.id,
-                        thumbnail: product.image,
+                        thumbnail: product.thumbnail,
                         name: product.name,
                         availableQuantity: product.quantity,
                         price: product.price
