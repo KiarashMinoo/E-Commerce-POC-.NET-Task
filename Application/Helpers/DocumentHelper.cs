@@ -52,7 +52,7 @@ namespace Application.Helpers
             if (image != null && makeThumbnail)
             {
                 var bitmap = SKBitmap.FromImage(image);
-                var ratioFactor = bitmap.Width / ThumbnailWidth;
+                var ratioFactor = ThumbnailWidth / bitmap.Width;
                 var height = bitmap.Height * ratioFactor;
 
                 using SKBitmap scaledBitmap = bitmap.Resize(new SKImageInfo(ThumbnailWidth, height), SKFilterQuality.Medium);

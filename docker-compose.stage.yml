@@ -18,7 +18,7 @@ services:
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
     depends_on:
       - pgbouncer
-      - mongodb-master
+      - mongodb-primary
       - elasticsearch-master
     environment:
       - ASPNETCORE_ENVIRONMENT=Stage

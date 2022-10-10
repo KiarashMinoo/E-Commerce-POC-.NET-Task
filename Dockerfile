@@ -3,7 +3,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
 EXPOSE 80
-EXPOSE 443
 
 ENV http_proxy="http://192.168.1.10:1080"
 ENV https_proxy="http://192.168.1.10:1080"
@@ -33,4 +32,4 @@ RUN dotnet publish "Api.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Api.dll", "--urls", "http://+:80;https://+:443"]
+ENTRYPOINT ["dotnet", "Api.dll", "--urls", "http://+:80"]
