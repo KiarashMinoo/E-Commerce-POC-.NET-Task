@@ -16,6 +16,7 @@ using Prometheus;
 using Serilog;
 using System.IO.Compression;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -155,7 +156,7 @@ namespace Api
                 {
                     options.EnrichDiagnosticContext = (IDiagnosticContext diagnosticContext, HttpContext httpContext) =>
                     {
-                        var userId = httpContext.User.FindFirst("sid")?.Value;
+                        var userId = httpContext.User.FindFirst(ClaimTypes.Sid)?.Value;
                         if (!string.IsNullOrEmpty(userId))
                             diagnosticContext.Set("UserId", userId);
                     };
