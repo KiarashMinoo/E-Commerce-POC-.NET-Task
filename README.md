@@ -31,7 +31,7 @@
 * bitnami/mongodb:latest
 * docker.elastic.co/elasticsearch/elasticsearch:8.4.3     
 * docker.elastic.co/kibana/kibana:8.4.3
-* bitnami/openresty:latest
+* openresty/openresty
 
 #Running the app
 **Executions with docker and run normally are allowed except in running normally you should run docker compose to start all required 

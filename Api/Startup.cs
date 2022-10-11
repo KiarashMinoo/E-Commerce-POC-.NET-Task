@@ -237,7 +237,13 @@ namespace Api
 
                     endpoints.MapHealthChecks("/api/health", new HealthCheckOptions()
                     {
-                        ResultStatusCodes = { [HealthStatus.Healthy] = StatusCodes.Status200OK, [HealthStatus.Degraded] = StatusCodes.Status200OK, [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable }
+                        ResponseWriter = HealthCheckWriter.WriteResponse,
+                        AllowCachingResponses = false,
+                        ResultStatusCodes = {
+                            [HealthStatus.Healthy] = StatusCodes.Status200OK,
+                            [HealthStatus.Degraded] = StatusCodes.Status200OK,
+                            [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+                        }
                     });
                 });
 

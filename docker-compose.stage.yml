@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: always
+    restart: on-failure 
     networks:
       - postgresql
       - mongodb
@@ -32,7 +32,7 @@ services:
       replicas: 3
 
   ecommerce-nginx:
-    image: bitnami/openresty:latest
+    image: openresty/openresty
     restart: on-failure   
     user: root
     ports: 
@@ -40,7 +40,8 @@ services:
     networks:      
       - api
     volumes:       
-      - "./nginx.conf:/etc/openresty/nginx.conf:ro"
+      - ./nginx.conf:/etc/openresty/nginx.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     links:
       - ecommerce
     depends_on:
