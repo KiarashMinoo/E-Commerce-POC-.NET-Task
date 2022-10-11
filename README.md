@@ -43,3 +43,5 @@ DomainEvents was the best solution. Contexts are different and also depends on i
 successful post processor pipeline of Mediatr publish DomainEvents and handlers updating MongoDb side data. Commands and Queries are working independently 
 and using required services perfectly. Somehow in a few cases syncing data are not going to done perfectly; In these cases, using Quartz and synching data are suggested.
 **
+
+The Url Is: http://localhost:8080/_ui/index.html
